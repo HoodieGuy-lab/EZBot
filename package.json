@@ -1,0 +1,13 @@
+{
+  "name": "ezbot",
+  "version": "1.0.0",
+  "main": "main.js",
+  "author": "YourName",
+  "description": "My Desktop App",
+  "scripts": {
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "electron": "^33.0.0"
+  }
+}
