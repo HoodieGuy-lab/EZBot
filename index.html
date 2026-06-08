@@ -1,497 +1,796 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>EZBot Engine Pro</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EZBot Engine Pro — Build Discord Bots in Minutes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        :root {
-            --bg:        #0b0c10;
-            --bg2:       #0f1117;
-            --bg3:       #161922;
-            --bg4:       #1c2030;
-            --border:    rgba(255,255,255,0.055);
-            --border2:   rgba(255,255,255,0.10);
-            --accent:    #c8f135;
-            --accent-dim: rgba(200,241,53,0.12);
-            --red:       #ff5470;
-            --red-dim:   rgba(255,84,112,0.10);
-            --blue:      #5b9cf6;
-            --text:      #dde2f0;
-            --muted:     #5a6280;
-            --muted2:    #3d4460;
-            --font:      'Outfit', sans-serif;
-            --mono:      'IBM Plex Mono', monospace;
-        }
+  :root {
+    --bg: #0d0f13;
+    --bg2: #13161d;
+    --bg3: #1a1e28;
+    --accent: #b6f542;
+    --accent2: #f5a542;
+    --text: #eef0f4;
+    --muted: #7a8096;
+    --border: rgba(255,255,255,0.07);
+    --font-head: 'Syne', sans-serif;
+    --font-mono: 'Space Mono', monospace;
+  }
 
-        html, body {
-            height: 100%;
-            overflow: hidden;
-            background: var(--bg);
-            color: var(--text);
-            font-family: var(--font);
-        }
+  html { scroll-behavior: smooth; }
 
-        /* ── TITLE BAR ── */
-        .title-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: 36px;
-            padding: 0 0 0 16px;
-            background: var(--bg);
-            border-bottom: 1px solid var(--border);
-            -webkit-app-region: drag;
-            user-select: none;
-            flex-shrink: 0;
-        }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-head);
+    overflow-x: hidden;
+  }
 
-        .title-bar-brand {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-family: var(--mono);
-            font-size: 0.7rem;
-            font-weight: 700;
-            color: var(--muted);
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-        }
+  /* NAV */
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 5vw;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(13,15,19,0.92);
+    backdrop-filter: blur(12px);
+  }
 
-        .title-bolt {
-            width: 14px;
-            height: 14px;
-            background: var(--accent);
-            clip-path: polygon(62% 0%, 38% 44%, 68% 44%, 32% 100%, 56% 56%, 26% 56%);
-        }
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.1rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+  }
 
-        .window-controls {
-            display: flex;
-            -webkit-app-region: no-drag;
-            height: 100%;
-        }
+  .bolt {
+    width: 28px;
+    height: 28px;
+    background: var(--accent);
+    clip-path: polygon(60% 0%, 40% 45%, 70% 45%, 30% 100%, 55% 55%, 25% 55%);
+    flex-shrink: 0;
+  }
 
-        .ctrl {
-            width: 46px;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--muted);
-            cursor: pointer;
-            font-size: 0.7rem;
-            transition: background 0.15s, color 0.15s;
-        }
-        .ctrl:hover { background: rgba(255,255,255,0.05); color: var(--text); }
-        .ctrl.x:hover { background: var(--red); color: #fff; }
+  .nav-links {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+  }
 
-        /* ── LAYOUT ── */
-        .app {
-            display: flex;
-            flex-direction: column;
-            height: calc(100vh - 36px);
-            padding: 20px 22px 18px;
-            gap: 14px;
-            overflow: hidden;
-        }
+  .nav-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.85rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
 
-        /* ── TOP ROW ── */
-        .top-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-shrink: 0;
-        }
+  .nav-links a:hover { color: var(--text); }
 
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1.15rem;
-            font-weight: 800;
-            letter-spacing: 0.06em;
-            color: #fff;
-        }
+  .btn-nav {
+    background: var(--accent);
+    color: #0d0f13;
+    border: none;
+    padding: 0.6rem 1.4rem;
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-decoration: none;
+    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+    transition: opacity 0.2s;
+  }
+  .btn-nav:hover { opacity: 0.85; }
 
-        .logo-bolt {
-            width: 26px;
-            height: 26px;
-            background: var(--accent);
-            clip-path: polygon(62% 0%, 38% 44%, 68% 44%, 32% 100%, 56% 56%, 26% 56%);
-            flex-shrink: 0;
-        }
+  /* HERO */
+  .hero {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+    padding: 6rem 5vw 5rem;
+    min-height: 90vh;
+    position: relative;
+    overflow: hidden;
+  }
 
-        /* ── LANG TABS ── */
-        .tabs {
-            display: flex;
-            background: var(--bg3);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 3px;
-            gap: 3px;
-        }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -200px;
+    right: -200px;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(182,245,66,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
 
-        .tab {
-            padding: 6px 16px;
-            font-family: var(--mono);
-            font-size: 0.72rem;
-            font-weight: 600;
-            letter-spacing: 0.04em;
-            border-radius: 6px;
-            cursor: pointer;
-            color: var(--muted);
-            transition: all 0.18s;
-            -webkit-app-region: no-drag;
-        }
+  .hero-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    padding: 0.4rem 1rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1.5rem;
+  }
 
-        .tab:hover { color: var(--text); }
+  .hero-tag::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 2s infinite;
+  }
 
-        .tab.active {
-            background: var(--accent);
-            color: #0b0c10;
-        }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
 
-        /* ── TOKEN ROW ── */
-        .token-row {
-            display: flex;
-            align-items: center;
-            background: var(--bg2);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 0 16px;
-            height: 44px;
-            gap: 12px;
-            flex-shrink: 0;
-            transition: border-color 0.2s;
-        }
+  .hero h1 {
+    font-size: clamp(2.8rem, 5vw, 4.5rem);
+    font-weight: 800;
+    line-height: 1.0;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.5rem;
+  }
 
-        .token-row:focus-within {
-            border-color: rgba(200,241,53,0.3);
-        }
+  .hero h1 span {
+    color: var(--accent);
+  }
 
-        .token-label {
-            font-family: var(--mono);
-            font-size: 0.65rem;
-            font-weight: 700;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
-            color: var(--accent);
-            white-space: nowrap;
-            flex-shrink: 0;
-        }
+  .hero-desc {
+    font-size: 1.05rem;
+    color: var(--muted);
+    line-height: 1.7;
+    margin-bottom: 2.5rem;
+    max-width: 480px;
+    font-weight: 400;
+  }
 
-        .token-divider {
-            width: 1px;
-            height: 18px;
-            background: var(--border2);
-            flex-shrink: 0;
-        }
+  .hero-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
 
-        .token-row input {
-            background: transparent;
-            border: none;
-            outline: none;
-            color: var(--text);
-            font-family: var(--mono);
-            font-size: 0.85rem;
-            width: 100%;
-            letter-spacing: 0.05em;
-        }
+  .btn-primary {
+    background: var(--accent);
+    color: #0d0f13;
+    border: none;
+    padding: 0.9rem 2rem;
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+    transition: opacity 0.2s, transform 0.15s;
+  }
+  .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
 
-        .token-row input::placeholder { color: var(--muted2); }
+  .btn-secondary {
+    border: 1px solid var(--border);
+    color: var(--text);
+    background: transparent;
+    padding: 0.9rem 2rem;
+    font-family: var(--font-head);
+    font-weight: 600;
+    font-size: 0.95rem;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    text-decoration: none;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .btn-secondary:hover { border-color: rgba(255,255,255,0.25); background: var(--bg2); }
 
-        /* ── EDITOR ── */
-        .editor-wrap {
-            flex: 1;
-            min-height: 0;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            overflow: hidden;
-            position: relative;
-            background: #0d1117;
-        }
+  .hero-stats {
+    display: flex;
+    gap: 2rem;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+  }
 
-        .editor-wrap::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(200,241,53,0.15), transparent);
-            pointer-events: none;
-            z-index: 1;
-        }
+  .stat-num {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--accent);
+    display: block;
+  }
 
-        #editor-container {
-            width: 100%;
-            height: 100%;
-        }
+  .stat-label {
+    font-size: 0.78rem;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
 
-        .cm-editor { height: 100%; }
-        .cm-scroller { font-family: var(--mono) !important; font-size: 13px !important; line-height: 1.7 !important; }
+  /* APP PREVIEW */
+  .hero-visual {
+    position: relative;
+  }
 
-        /* ── BUTTONS ── */
-        .btn-row {
-            display: flex;
-            gap: 10px;
-            flex-shrink: 0;
-        }
+  .app-window {
+    background: #13161d;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.5);
+  }
 
-        .btn {
-            flex: 1;
-            height: 44px;
-            border: none;
-            border-radius: 10px;
-            font-family: var(--font);
-            font-weight: 700;
-            font-size: 0.8rem;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: all 0.18s;
-        }
+  .window-bar {
+    background: #0d0f13;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid var(--border);
+  }
 
-        #startBtn {
-            background: var(--accent);
-            color: #0b0c10;
-        }
+  .window-dots {
+    display: flex;
+    gap: 6px;
+  }
 
-        #startBtn:hover {
-            background: #d9ff50;
-            transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(200,241,53,0.2);
-        }
+  .dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+  }
+  .dot-r { background: #ff5f57; }
+  .dot-y { background: #febc2e; }
+  .dot-g { background: #28c840; }
 
-        #startBtn:active { transform: translateY(0); }
+  .window-title {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-left: 8px;
+  }
 
-        #stopBtn {
-            background: var(--red-dim);
-            color: var(--red);
-            border: 1px solid rgba(255,84,112,0.18);
-            flex: 0 0 160px;
-        }
+  .window-body {
+    padding: 20px;
+  }
 
-        #stopBtn:hover {
-            background: var(--red);
-            color: #fff;
-            border-color: var(--red);
-            transform: translateY(-1px);
-        }
+  .lang-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
 
-        #stopBtn:active { transform: translateY(0); }
+  .lang-tab {
+    padding: 6px 14px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    cursor: pointer;
+    border-radius: 4px;
+    letter-spacing: 0.04em;
+  }
 
-        /* ── TERMINAL ── */
-        .console-wrap {
-            flex-shrink: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            height: 140px;
-        }
+  .lang-tab.active {
+    background: var(--accent);
+    color: #0d0f13;
+    font-weight: 700;
+  }
 
-        .console-header {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-family: var(--mono);
-            font-size: 0.65rem;
-            font-weight: 700;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
-            color: var(--muted);
-        }
+  .lang-tab:not(.active) {
+    background: var(--bg3);
+    color: var(--muted);
+    border: 1px solid var(--border);
+  }
 
-        .console-dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: var(--accent);
-            animation: blink 2.4s ease infinite;
-        }
+  .code-block {
+    background: #0d0f13;
+    border-radius: 6px;
+    padding: 16px;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    line-height: 1.75;
+    border: 1px solid var(--border);
+  }
 
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.25; }
-        }
+  .code-block .ln { color: #3d4258; margin-right: 16px; user-select: none; }
+  .code-block .kw { color: #b6f542; }
+  .code-block .str { color: #f5a542; }
+  .code-block .fn { color: #7eb8f5; }
+  .code-block .cm { color: #4a5070; }
+  .code-block .var { color: #e97ae6; }
 
-        #terminal {
-            flex: 1;
-            background: var(--bg2);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 12px 16px;
-            font-family: var(--mono);
-            font-size: 0.78rem;
-            line-height: 1.65;
-            color: var(--text);
-            overflow-y: auto;
-            white-space: pre-wrap;
-        }
+  .window-footer {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border-top: 1px solid var(--border);
+  }
 
-        .log-item { margin-bottom: 2px; display: flex; gap: 10px; }
-        .log-ts { color: var(--muted2); flex-shrink: 0; }
-        .log-info { color: var(--blue); }
-        .log-success { color: var(--accent); font-weight: 600; }
-        
-        .log-error {
-            color: var(--red);
-            background: var(--red-dim);
-            border-left: 2px solid var(--red);
-            padding: 6px 12px;
-            border-radius: 4px;
-            display: block;
-            margin: 3px 0;
-            white-space: pre-wrap;
-            width: 100%;
-        }
+  .btn-launch {
+    background: var(--accent);
+    color: #0d0f13;
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 14px;
+    text-align: center;
+    border: none;
+    cursor: pointer;
+  }
 
-        /* ── SCROLLBAR (terminal) ── */
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--muted2); border-radius: 4px; }
-    </style>
+  .btn-kill {
+    background: rgba(229,62,62,0.15);
+    color: #e53e3e;
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 14px;
+    text-align: center;
+    border: none;
+    border-left: 1px solid var(--border);
+    cursor: pointer;
+  }
+
+  /* FEATURES */
+  .section {
+    padding: 6rem 5vw;
+  }
+
+  .section-label {
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1rem;
+    font-family: var(--font-mono);
+  }
+
+  .section-title {
+    font-size: clamp(1.8rem, 3vw, 2.8rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 3.5rem;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+
+  .feature-card {
+    background: var(--bg);
+    padding: 2rem;
+    transition: background 0.2s;
+  }
+
+  .feature-card:hover { background: var(--bg2); }
+
+  .feature-icon {
+    width: 40px;
+    height: 40px;
+    background: rgba(182,245,66,0.1);
+    border: 1px solid rgba(182,245,66,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.25rem;
+    font-size: 1.1rem;
+  }
+
+  .feature-card h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 0.6rem;
+    letter-spacing: -0.01em;
+  }
+
+  .feature-card p {
+    font-size: 0.88rem;
+    color: var(--muted);
+    line-height: 1.65;
+    font-weight: 400;
+  }
+
+  /* HOW IT WORKS */
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 2rem;
+    position: relative;
+  }
+
+  .step {
+    position: relative;
+  }
+
+  .step-num {
+    font-family: var(--font-mono);
+    font-size: 3rem;
+    font-weight: 700;
+    color: rgba(182,245,66,0.12);
+    line-height: 1;
+    margin-bottom: 1rem;
+  }
+
+  .step h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  .step p {
+    font-size: 0.87rem;
+    color: var(--muted);
+    line-height: 1.65;
+    font-weight: 400;
+  }
+
+  .step-line {
+    position: absolute;
+    top: 1.5rem;
+    right: -1rem;
+    width: 2rem;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* CTA */
+  .cta-section {
+    margin: 0 5vw 6rem;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    padding: 4rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    flex-wrap: wrap;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-section::before {
+    content: '';
+    position: absolute;
+    bottom: -100px;
+    left: -100px;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(182,245,66,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .cta-section h2 {
+    font-size: clamp(1.6rem, 3vw, 2.4rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    max-width: 500px;
+  }
+
+  .cta-section h2 span { color: var(--accent); }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 2rem 5vw;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .footer-copy {
+    font-size: 0.8rem;
+    color: var(--muted);
+    font-family: var(--font-mono);
+  }
+
+  .footer-links {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+  }
+
+  .footer-links a {
+    font-size: 0.8rem;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .footer-links a:hover { color: var(--text); }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    .hero {
+      grid-template-columns: 1fr;
+      padding-top: 4rem;
+      min-height: auto;
+      gap: 3rem;
+    }
+
+    .hero-visual { order: -1; }
+
+    .nav-links { display: none; }
+
+    .cta-section { padding: 2.5rem; }
+  }
+
+  /* ANIMATE IN */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero-tag, .hero h1, .hero-desc, .hero-actions, .hero-stats {
+    animation: fadeUp 0.6s ease both;
+  }
+  .hero h1 { animation-delay: 0.1s; }
+  .hero-desc { animation-delay: 0.2s; }
+  .hero-actions { animation-delay: 0.3s; }
+  .hero-stats { animation-delay: 0.4s; }
+</style>
 </head>
 <body>
 
-    <div class="title-bar">
-        <div class="title-bar-brand">
-            <div class="title-bolt"></div>
-            EZBot Engine Pro
-        </div>
-        <div class="window-controls">
-            <div class="ctrl" onclick="minimizeWindow()">—</div>
-            <div class="ctrl" onclick="maximizeWindow()">⬜</div>
-            <div class="ctrl x" onclick="closeWindow()">✕</div>
-        </div>
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <div class="bolt" aria-hidden="true"></div>
+    EZBOT PRO
+  </div>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#how">How it works</a></li>
+    <li><a href="#download">Download</a></li>
+  </ul>
+  <a href="https://paypal.me/WarpDevlopment" target="_blank" class="btn-nav" style="background: transparent; color: var(--accent); border: 1px solid rgba(182,245,66,0.3); clip-path: none; margin-right: 8px;">💛 Donate</a>
+  <a href="#download" class="btn-nav">⬇ Download</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-tag">Now available — Windows</div>
+    <h1>Build Discord Bots <span>Without the Headache</span></h1>
+    <p class="hero-desc">EZBot Engine Pro gives you a real-time code editor, instant bot deployment, and a live console — all in one desktop app. JavaScript or Python. No config files, no terminals.</p>
+    <div class="hero-actions">
+      <a href="#download" class="btn-primary">
+        ⬇ Download Free
+      </a>
+      <a href="#features" class="btn-secondary">See features</a>
     </div>
-
-    <div class="app">
-
-        <div class="top-row">
-            <div class="logo">
-                <div class="logo-bolt"></div>
-                EZBOT PRO
-            </div>
-            <div class="tabs">
-                <div class="tab active" id="jsTab" onclick="switchLanguage('javascript')">JavaScript (Node)</div>
-                <div class="tab" id="pyTab" onclick="switchLanguage('python')">Python</div>
-            </div>
-        </div>
-
-        <div class="token-row">
-            <span class="token-label">Bot Token</span>
-            <div class="token-divider"></div>
-            <input type="password" id="tokenInput" placeholder="Paste your Discord bot token here…">
-        </div>
-
-        <div class="editor-wrap">
-            <div id="editor-container"></div>
-        </div>
-
-        <div class="btn-row">
-            <button class="btn" id="startBtn" onclick="startBot()">
-                ▶ Launch Environment
-            </button>
-            <button class="btn" id="stopBtn" onclick="stopBot()">
-                ■ Kill Process
-            </button>
-        </div>
-
-        <div class="console-wrap">
-            <div class="console-header">
-                <div class="console-dot"></div>
-                Live Console Stream
-            </div>
-            <div id="terminal"></div>
-        </div>
-
+    <div class="hero-stats">
+      <div>
+        <span class="stat-num">2</span>
+        <span class="stat-label">Languages</span>
+      </div>
+      <div>
+        <span class="stat-num">&lt;60s</span>
+        <span class="stat-label">To first bot</span>
+      </div>
+      <div>
+        <span class="stat-num">Free</span>
+        <span class="stat-label">Always</span>
+      </div>
     </div>
+  </div>
 
-    <script>
-        const { ipcRenderer } = require('electron');
-        const { EditorView, basicSetup } = require('codemirror');
-        const { Compartment } = require('@codemirror/state');
-        const { javascript } = require('@codemirror/lang-javascript');
-        const { python } = require('@codemirror/lang-python');
-        const { oneDark } = require('@codemirror/theme-one-dark');
+  <!-- APP MOCKUP -->
+  <div class="hero-visual">
+    <div class="app-window">
+      <div class="window-bar">
+        <div class="window-dots">
+          <div class="dot dot-r"></div>
+          <div class="dot dot-y"></div>
+          <div class="dot dot-g"></div>
+        </div>
+        <span class="window-title">⚡ EZBot Engine Pro</span>
+      </div>
+      <div class="window-body">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <span style="font-family:var(--font-mono);font-size:0.72rem;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;">Bot Token</span>
+          <span style="font-family:var(--font-mono);font-size:0.72rem;color:#3d4258;">••••••••••••••••••••••••</span>
+        </div>
+        <div class="lang-tabs">
+          <div class="lang-tab active">JavaScript (Node)</div>
+          <div class="lang-tab">Python</div>
+        </div>
+        <div class="code-block">
+<span class="ln">1</span><span class="kw">const</span> { <span class="var">Client</span>, <span class="var">GatewayIntentBits</span> } = <span class="fn">require</span>(<span class="str">'discord.js'</span>);<br>
+<span class="ln">2</span><span class="kw">const</span> <span class="var">client</span> = <span class="kw">new</span> <span class="fn">Client</span>({ intents: [<span class="var">GatewayIntentBits.Guilds</span>] });<br>
+<span class="ln">3</span><br>
+<span class="ln">4</span><span class="var">client</span>.<span class="fn">once</span>(<span class="str">'ready'</span>, () => {<br>
+<span class="ln">5</span>&nbsp;&nbsp;<span class="var">console</span>.<span class="fn">log</span>(<span class="str">'[SUCCESS] Bot initialized!'</span>);<br>
+<span class="ln">6</span>&nbsp;&nbsp;<span class="var">console</span>.<span class="fn">log</span>(<span class="str">`[INFO] Logged in as <span class="var">${client.user.tag}</span>`</span>);<br>
+<span class="ln">7</span>});<br>
+<span class="ln">8</span><br>
+<span class="ln">9</span><span class="var">client</span>.<span class="fn">login</span>(<span class="var">process</span>.env.<span class="var">TOKEN</span>);
+        </div>
+        <div style="margin-top:12px;background:#0d0f13;border:1px solid var(--border);border-radius:6px;padding:10px 14px;">
+          <div style="font-family:var(--font-mono);font-size:0.7rem;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;">● Live Console Stream</div>
+          <div style="font-family:var(--font-mono);font-size:0.72rem;color:#4a5070;">&gt; Waiting for launch...</div>
+        </div>
+      </div>
+      <div class="window-footer">
+        <div class="btn-launch">▶ Launch Environment</div>
+        <div class="btn-kill">■ Kill Process</div>
+      </div>
+    </div>
+  </div>
+</section>
 
-        const terminal = document.getElementById('terminal');
-        let editorView;
-        let languageConf = new Compartment();
-        let currentLanguage = 'javascript';
+<!-- FEATURES -->
+<section class="section" id="features">
+  <div class="section-label">// what you get</div>
+  <div class="section-title">Everything you need.<br>Nothing you don't.</div>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">✏</div>
+      <h3>Built-in Code Editor</h3>
+      <p>Syntax-highlighted editor with line numbers. Write your bot logic directly in the app — no external IDE needed.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">⚡</div>
+      <h3>One-Click Launch</h3>
+      <p>Hit Launch Environment and your bot is live. No terminal commands, no npm scripts, no environment setup.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📟</div>
+      <h3>Live Console Stream</h3>
+      <p>Watch your bot's output in real time. Errors, logs, and events stream directly into the console panel.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔀</div>
+      <h3>JS &amp; Python Support</h3>
+      <p>Switch between JavaScript (Node.js) and Python with a single click. Same interface, same workflow, both runtimes.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔑</div>
+      <h3>Secure Token Storage</h3>
+      <p>Your bot token is stored securely and masked in the UI. Never accidentally expose your credentials again.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🛑</div>
+      <h3>Instant Kill Switch</h3>
+      <p>Stop your bot process instantly with the Kill Process button. Clean shutdown, every time.</p>
+    </div>
+  </div>
+</section>
 
-        function minimizeWindow() { ipcRenderer.send('window-minimize'); }
-        function maximizeWindow() { ipcRenderer.send('window-maximize'); }
-        function closeWindow()    { ipcRenderer.send('window-close'); }
+<!-- HOW IT WORKS -->
+<section class="section" id="how" style="background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+  <div class="section-label">// getting started</div>
+  <div class="section-title">Up and running<br>in three steps.</div>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">01</div>
+      <h3>Download &amp; Install</h3>
+      <p>Grab the Windows installer and run it — no dependencies, no Node.js required separately.</p>
+      <div class="step-line"></div>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <h3>Paste your Token</h3>
+      <p>Create a bot in the Discord Developer Portal, copy your token, and paste it into EZBot Pro. Stays masked on screen.</p>
+      <div class="step-line"></div>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <h3>Write &amp; Launch</h3>
+      <p>Write your bot code in the editor — or use the starter template — then hit Launch. Your bot goes live instantly.</p>
+    </div>
+  </div>
+</section>
 
-        const defaultTemplates = {
-            javascript: `const { Client, GatewayIntentBits } = require('discord.js');\nconst client = new Client({ intents: [GatewayIntentBits.Guilds] });\n\nclient.once('ready', () => {\n    console.log('[SUCCESS] Node Bot initialized successfully!');\n    console.log(\`[INFO] Authenticated as: \${client.user.tag}\`);\n});\n\nclient.login(process.env.TOKEN);`,
-            python: `import discord\nimport os\n\nclass MyClient(discord.Client):\n    async def on_ready(self):\n        print('[SUCCESS] Python Bot initialized successfully!')\n        print(f'[INFO] Authenticated as: {self.user}')\n\nintents = discord.Intents.default()\nclient = MyClient(intents=intents)\nclient.run(os.getenv('TOKEN'))`
-        };
+<!-- SMARTSCREEN WARNING EXPLAINER -->
+<section class="section" style="padding-top: 0; padding-bottom: 4rem;">
+  <div style="border: 1px solid rgba(182,245,66,0.15); background: var(--bg2); border-radius: 4px; overflow: hidden;">
+    <div style="background: rgba(182,245,66,0.07); border-bottom: 1px solid rgba(182,245,66,0.12); padding: 1.2rem 2rem; display: flex; align-items: center; gap: 12px;">
+      <span style="font-size: 1.2rem;">🛡️</span>
+      <span style="font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); font-weight: 700;">Why does Windows show a warning?</span>
+    </div>
+    <div style="padding: 2rem; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+      <div>
+        <p style="font-size: 0.95rem; line-height: 1.8; color: var(--muted);">
+          When you download EZBot Pro, Windows may show a <strong style="color: var(--text);">"Windows protected your PC"</strong> message. This is completely normal and does <strong style="color: var(--text);">not</strong> mean the app is dangerous.
+        </p>
+        <p style="font-size: 0.95rem; line-height: 1.8; color: var(--muted); margin-top: 1rem;">
+          Windows SmartScreen shows this warning for <strong style="color: var(--text);">any new app</strong> that hasn't been downloaded by thousands of users yet — including totally legitimate software. It has nothing to do with whether an app is safe or not.
+        </p>
+        <p style="font-size: 0.95rem; line-height: 1.8; color: var(--muted); margin-top: 1rem;">
+          EZBot Pro is <strong style="color: var(--accent);">100% free, open source, and contains no malware</strong>. The source code is publicly available on GitHub for anyone to inspect.
+        </p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 1rem;">
+        <div style="font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.25rem;">To run the app:</div>
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+          <div style="display: flex; align-items: flex-start; gap: 12px; background: var(--bg3); border: 1px solid var(--border); padding: 1rem; border-radius: 4px;">
+            <span style="background: var(--accent); color: #0d0f13; font-family: var(--font-mono); font-size: 0.7rem; font-weight: 700; padding: 2px 8px; border-radius: 2px; flex-shrink: 0; margin-top: 1px;">1</span>
+            <span style="font-size: 0.88rem; color: var(--muted); line-height: 1.5;">Click <strong style="color: var(--text);">More info</strong> on the blue warning popup</span>
+          </div>
+          <div style="display: flex; align-items: flex-start; gap: 12px; background: var(--bg3); border: 1px solid var(--border); padding: 1rem; border-radius: 4px;">
+            <span style="background: var(--accent); color: #0d0f13; font-family: var(--font-mono); font-size: 0.7rem; font-weight: 700; padding: 2px 8px; border-radius: 2px; flex-shrink: 0; margin-top: 1px;">2</span>
+            <span style="font-size: 0.88rem; color: var(--muted); line-height: 1.5;">Click <strong style="color: var(--text);">Run anyway</strong> — the app will install normally</span>
+          </div>
+          <div style="display: flex; align-items: flex-start; gap: 12px; background: var(--bg3); border: 1px solid var(--border); padding: 1rem; border-radius: 4px;">
+            <span style="background: var(--accent); color: #0d0f13; font-family: var(--font-mono); font-size: 0.7rem; font-weight: 700; padding: 2px 8px; border-radius: 2px; flex-shrink: 0; margin-top: 1px;">3</span>
+            <span style="font-size: 0.88rem; color: var(--muted); line-height: 1.5;">That's it! You'll never see this warning again for EZBot Pro</span>
+          </div>
+        </div>
+        <a href="https://github.com/HoodieGuy-lab/EZBot" target="_blank" style="margin-top: 0.5rem; font-size: 0.82rem; color: var(--muted); text-decoration: none; display: flex; align-items: center; gap: 6px; transition: color 0.2s;">
+          <span>🔗</span> <span style="border-bottom: 1px solid var(--border);">View the source code on GitHub</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
 
-        editorView = new EditorView({
-            doc: defaultTemplates.javascript,
-            extensions: [basicSetup, languageConf.of(javascript()), oneDark],
-            parent: document.getElementById('editor-container')
-        });
+<!-- DOWNLOAD CTA -->
+<section class="section" id="download" style="padding-bottom: 2rem;">
+  <div class="cta-section">
+    <h2>Ready to build your <span>Discord bot</span>?</h2>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:center;">
+      <a href="https://github.com/HoodieGuy-lab/EZBot/releases/download/v1.0/EZBot_Setup.exe" class="btn-primary" style="font-size:1rem;padding:1rem 2.2rem;">
+        ⬇ Download for Windows
+      </a>
+    </div>
+  </div>
+</section>
 
-        function switchLanguage(lang) {
-            if (currentLanguage === lang) return;
-            currentLanguage = lang;
-            document.getElementById('jsTab').classList.toggle('active', lang === 'javascript');
-            document.getElementById('pyTab').classList.toggle('active', lang === 'python');
-            editorView.dispatch({
-                changes: { from: 0, to: editorView.state.doc.length, insert: defaultTemplates[lang] },
-                effects: languageConf.reconfigure(lang === 'javascript' ? javascript() : python())
-            });
-        }
+<!-- DONATE -->
+<section style="padding: 0 5vw 4rem;">
+  <div style="border: 1px solid var(--border); background: var(--bg2); padding: 2.5rem 3rem; display: flex; align-items: center; justify-content: space-between; gap: 2rem; flex-wrap: wrap;">
+    <div>
+      <div style="font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.6rem;">// support the project</div>
+      <div style="font-size: 1.3rem; font-weight: 800; letter-spacing: -0.01em;">EZBot Pro is free — keep it that way 💛</div>
+      <div style="font-size: 0.88rem; color: var(--muted); margin-top: 0.4rem; font-weight: 400;">If it saved you time, consider buying me a coffee. Every bit helps!</div>
+    </div>
+    <a href="https://paypal.me/WarpDevlopment" target="_blank" style="background: #ffc439; color: #0d0f13; border: none; padding: 0.9rem 2rem; font-family: var(--font-head); font-weight: 700; font-size: 0.95rem; letter-spacing: 0.04em; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; border-radius: 8px; white-space: nowrap; transition: opacity 0.2s;">💛 Donate via PayPal</a>
+  </div>
+</section>
 
-        function startBot() {
-            ipcRenderer.send('start-bot', {
-                code:     editorView.state.doc.toString(),
-                token:    document.getElementById('tokenInput').value,
-                language: currentLanguage
-            });
-        }
+<!-- FOOTER -->
+<footer>
+  <div class="footer-copy">© 2025 EZBot Engine Pro. All rights reserved.</div>
+  <ul class="footer-links">
+    <li><a href="https://paypal.me/WarpDevlopment" target="_blank">Donate</a></li>
+    <li><a href="#">Discord</a></li>
+    <li><a href="#">GitHub</a></li>
+    <li><a href="#">Support</a></li>
+    <li><a href="#">Privacy</a></li>
+  </ul>
+</footer>
 
-        function stopBot() { ipcRenderer.send('stop-bot'); }
-
-        function ts() {
-            return new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
-        }
-
-        function appendLog(text, cls) {
-            const row = document.createElement('div');
-            row.className = `log-item`;
-            if (cls === 'log-error') {
-                row.innerHTML = `<span class="log-error">${text}</span>`;
-            } else {
-                row.innerHTML = `<span class="log-ts">${ts()}</span><span class="${cls}">${text}</span>`;
-            }
-            terminal.appendChild(row);
-            terminal.scrollTop = terminal.scrollHeight;
-        }
-
-        // INTELLIGENT STREAM ROUTER FOR MULTI-LINE DIAGNOSTIC BLOCKS
-        ipcRenderer.on('console-log', (event, message) => {
-            if (message.includes('[🚨 SYSTEM CRASH DIAGNOSIS]')) {
-                appendLog(message, 'log-error');
-                return;
-            }
-
-            message.split('\n').forEach(line => {
-                if (!line.trim()) return;
-                if (line.includes('[SUCCESS]'))      appendLog(line, 'log-success');
-                else if (line.includes('[ERROR]'))   appendLog(line, 'log-error');
-                else                                 appendLog(line, 'log-info');
-            });
-        });
-    </script>
 </body>
 </html>
